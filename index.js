@@ -58,7 +58,7 @@ async function run() {
     // Create reviews api in db
     app.post("/reviews", async (req, res) => {
       const newReviews = req.body;
-      const result = await userCollection.insertOne(newReviews);
+      const result = await reviewCollection.insertOne(newReviews);
       res.send(result);
     });
     // --------------------------------------------------------
