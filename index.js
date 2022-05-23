@@ -23,7 +23,14 @@ async function run() {
   // try catch finally
   try {
     await client.connect();
-    // const userCollection = client.db("foodExpress").collection("user");
+    const toolCollection = client.db("caliph-tools").collection("tools");
+
+    // Get  api to read all tools
+    app.get("/tools", async (req, res) => {
+      const tools = (await toolCollection.find().toArray()).reverse();
+      res.send(tools);
+    });
+    // -------------------------------------------
   } finally {
   }
 }
@@ -33,7 +40,7 @@ run().catch(console.dir);
 
 // http://localhost:5000/
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Hello Tools World!");
 });
 
 app.listen(port, () => {
