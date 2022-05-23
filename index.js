@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
 
 // Middleware
@@ -33,13 +33,21 @@ async function run() {
     });
     // -------------------------------------------
 
+    // Get  API to Tools Read by ID
+    app.get("/tools/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await userCollection.findOne(query);
+      res.send(result);
+    });
+    // -------------------------------------------
+
     // Get  api to read all reviews
     app.get("/reviews", async (req, res) => {
       const reviews = (await reviewCollection.find().toArray()).reverse();
       res.send(reviews);
     });
     // -------------------------------------------
-    
   } finally {
   }
 }
