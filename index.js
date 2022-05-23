@@ -54,12 +54,26 @@ async function run() {
     });
     // -------------------------------------------
 
+    // Get  api to read all tools
+    app.get("/orders", async (req, res) => {
+      const orders = (await orderCollection.find().toArray()).reverse();
+      res.send(orders);
+    });
+    // -------------------------------------------
+
     // Create orders api in db
     app.post("/orders", async (req, res) => {
       const orders = req.body;
-      console.log("New orders adding ", orders);
-      const result = await orderCollection.insertOne(orders);
-      res.send(result);
+      const { quantity, orderQuantity, toolsId: id } = orders;
+      const newQuantity = quantity - orderQuantity;
+      const filter = { _id: ObjectId(id) };
+      const updateDoc = {
+        $set: { quantity: newQuantity },
+      };
+      const result = await toolCollection.updateOne(filter, updateDoc);
+      const order = await orderCollection.insertOne(orders);
+
+      res.send(order);
     });
     // ---------------------------------------------------
   } finally {
