@@ -24,6 +24,7 @@ async function run() {
   try {
     await client.connect();
     const toolCollection = client.db("caliph-tools").collection("tools");
+    const reviewCollection = client.db("caliph-tools").collection("reviews");
 
     // Get  api to read all tools
     app.get("/tools", async (req, res) => {
@@ -31,6 +32,14 @@ async function run() {
       res.send(tools);
     });
     // -------------------------------------------
+
+    // Get  api to read all reviews
+    app.get("/reviews", async (req, res) => {
+      const reviews = (await reviewCollection.find().toArray()).reverse();
+      res.send(reviews);
+    });
+    // -------------------------------------------
+    
   } finally {
   }
 }
