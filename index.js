@@ -28,6 +28,7 @@ async function run() {
     const toolCollection = client.db("caliph-tools").collection("tools");
     const reviewCollection = client.db("caliph-tools").collection("reviews");
     const orderCollection = client.db("caliph-tools").collection("orders");
+    const userCollection = client.db("caliph-tools").collection("users");
 
     // ======================================
 
@@ -76,6 +77,23 @@ async function run() {
       res.send(order);
     });
     // ---------------------------------------------------
+
+    //  Update (upsert / insert) user data in db
+    app.put("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: user,
+      };
+      const result = await userCollection.updateOne(filter, updateDoc, options);
+      // let token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, {
+      //   expiresIn: "1d",
+      // });
+      res.send({ result });
+    });
+    // -------------------------------------------
   } finally {
   }
 }
