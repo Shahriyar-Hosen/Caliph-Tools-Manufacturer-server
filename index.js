@@ -23,8 +23,13 @@ async function run() {
   // try catch finally
   try {
     await client.connect();
+
+    // All Collection
     const toolCollection = client.db("caliph-tools").collection("tools");
     const reviewCollection = client.db("caliph-tools").collection("reviews");
+    const orderCollection = client.db("caliph-tools").collection("orders");
+
+    // ======================================
 
     // Get  api to read all tools
     app.get("/tools", async (req, res) => {
@@ -37,7 +42,7 @@ async function run() {
     app.get("/tools/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
-      const result = await userCollection.findOne(query);
+      const result = await toolCollection.findOne(query);
       res.send(result);
     });
     // -------------------------------------------
@@ -48,6 +53,15 @@ async function run() {
       res.send(reviews);
     });
     // -------------------------------------------
+
+    // Create orders api in db
+    app.post("/orders", async (req, res) => {
+      const orders = req.body;
+      console.log("New orders adding ", orders);
+      const result = await orderCollection.insertOne(orders);
+      res.send(result);
+    });
+    // ---------------------------------------------------
   } finally {
   }
 }
