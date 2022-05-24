@@ -48,6 +48,14 @@ async function run() {
     });
     // -------------------------------------------
 
+    // Create tools api in db
+    app.post("/tools", async (req, res) => {
+      const newTools = req.body;
+      const result = await toolCollection.insertOne(newTools);
+      res.send(result);
+    });
+    // --------------------------------------------------------
+
     // Get  api to read all reviews
     app.get("/reviews", async (req, res) => {
       const reviews = (await reviewCollection.find().toArray()).reverse();
