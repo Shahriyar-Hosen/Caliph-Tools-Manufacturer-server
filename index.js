@@ -86,6 +86,16 @@ async function run() {
     });
     // ---------------------------------------------------
 
+    // Get  API to Read by Email
+    app.get("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await userCollection.findOne(query);
+      res.send(result);
+    });
+    // -------------------------------------------
+
+
     //  Update (upsert / insert) user data in db
     app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
