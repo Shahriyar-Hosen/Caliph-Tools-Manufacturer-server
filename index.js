@@ -155,7 +155,7 @@ async function run() {
     // -------------------------------------------
 
     //  Update (upsert / insert) user data in db
-    app.put("/user/:email", async (req, res) => {
+    app.put("/users/:email", async (req, res) => {
       const email = req.params.email;
       const user = req.body;
       const filter = { email: email };
@@ -164,10 +164,11 @@ async function run() {
         $set: user,
       };
       const result = await userCollection.updateOne(filter, updateDoc, options);
-      // let token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, {
+
+      // var token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, {
       //   expiresIn: "1d",
       // });
-      res.send({ result });
+      res.send(result);
     });
     // -------------------------------------------
 
