@@ -70,6 +70,15 @@ async function run() {
     });
     // -------------------------------------------
 
+    // Get  API to Read by Email
+    app.get("/orders/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await orderCollection.find(query).toArray();
+      res.send(result);
+    });
+    // -------------------------------------------
+
     // Create orders api in db
     app.post("/orders", async (req, res) => {
       const orders = req.body;
