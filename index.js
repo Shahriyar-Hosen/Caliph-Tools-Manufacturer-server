@@ -95,6 +95,20 @@ async function run() {
     });
     // -------------------------------------------
 
+    //  Update user data in db
+    app.put("/user/:id", async (req, res) => {
+      const id = req.params.id;
+      const updateUser = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: updateUser,
+      };
+      const result = await userCollection.updateOne(filter, updateDoc, options);
+
+      res.send(result);
+    });
+    // -------------------------------------------
 
     //  Update (upsert / insert) user data in db
     app.put("/user/:email", async (req, res) => {
