@@ -95,29 +95,26 @@ async function run() {
     });
     // ---------------------------------------------------
 
-        //  Update orders data in db
-        app.put("/order/:id", async (req, res) => {
-          const id = req.params.id;
-          const updateOrders = req.body;
-          const filter = { _id: ObjectId(id) };
-          const options = { upsert: true };
-          const updateDoc = {
-            $set: updateOrders,
-          };
-          const result = await orderCollection.updateOne(filter, updateDoc, options);
-    
-          res.send(result);
-        });
-        // -------------------------------------------
+    //  Update orders data in db
+    app.put("/order/:id", async (req, res) => {
+      const id = req.params.id;
+      const updateOrders = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: updateOrders,
+      };
+      const result = await orderCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
 
-        //  Delete user in db
-        app.delete("/orders/:id", async (req, res) => {
-          const id = req.params.id;
-          const query = { _id: ObjectId(id) };
-          const result = await orderCollection.deleteOne(query);
-          res.send(result);
-        });
-        // -------------------------------------------
+      res.send(result);
+    });
+    // -------------------------------------------
+
+    
 
     // Get  API to Read by Email
     app.get("/user/:email", async (req, res) => {
