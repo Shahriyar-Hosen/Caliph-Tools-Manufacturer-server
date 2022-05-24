@@ -123,6 +123,12 @@ async function run() {
     });
     // -------------------------------------------
 
+    // Get  api to read all users
+    app.get("/users", async (req, res) => {
+      const users = (await userCollection.find().toArray()).reverse();
+      res.send(users);
+    });
+    // -------------------------------------------
 
     // Get  API to Read by Email
     app.get("/user/:email", async (req, res) => {
