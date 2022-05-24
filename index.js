@@ -114,7 +114,7 @@ async function run() {
     });
     // -------------------------------------------
 
-    //  Delete user in db
+    //  Delete order in db
     app.delete("/orders/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
@@ -168,6 +168,15 @@ async function run() {
       //   expiresIn: "1d",
       // });
       res.send({ result });
+    });
+    // -------------------------------------------
+
+    //  Delete user in db
+    app.delete("/user/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await userCollection.deleteOne(query);
+      res.send(result);
     });
     // -------------------------------------------
   } finally {
