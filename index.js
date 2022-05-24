@@ -71,6 +71,15 @@ async function run() {
     });
     // -------------------------------------------
 
+    //  Delete tools in db
+    app.delete("/tools/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await toolCollection.deleteOne(query);
+      res.send(result);
+    });
+    // -------------------------------------------
+
     // Get  api to read all reviews
     app.get("/reviews", async (req, res) => {
       const reviews = (await reviewCollection.find().toArray()).reverse();
