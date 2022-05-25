@@ -169,7 +169,7 @@ async function run() {
     // -------------------------------------------
 
     // Get  API to Read by Email
-    app.get("/orders/:email", verifyJWT, verifyNotAdmin, async (req, res) => {
+    app.get("/order/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
       const result = (await orderCollection.find(query).toArray()).reverse();
