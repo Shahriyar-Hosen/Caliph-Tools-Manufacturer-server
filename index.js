@@ -80,6 +80,24 @@ async function run() {
     };
     // =========================================
 
+    // Payment Intent Api
+    app.post("/create-payment-intent",verifyJWT, async (req, res) => {
+      const { price } = req.body;
+      const amount = price * 100;
+      const paymentIntent = await stripe.paymentIntents.create({
+        // amount: calculateOrderAmount(amount),
+        amount: amount,
+        currency: "usd",
+        payment_method_types: ["card"],
+        // automatic_payment_methods: {
+        //   enabled: true,
+        // },
+      });
+      res.send({ clientSecret: paymentIntent.client_secret });
+    });
+    // -----------------------------------------------------------------------------------
+
+
     // Get  api to read all tools
     app.get("/tools", async (req, res) => {
       const tools = (await toolCollection.find().toArray()).reverse();
