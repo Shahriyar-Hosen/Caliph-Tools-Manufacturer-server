@@ -1,9 +1,11 @@
 const express = require("express");
-const app = express();
 const cors = require("cors");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
+const app = express();
 const port = process.env.PORT || 5000;
 
 // Middleware
@@ -50,6 +52,7 @@ async function run() {
     const reviewCollection = client.db("caliph-tools").collection("reviews");
     const orderCollection = client.db("caliph-tools").collection("orders");
     const userCollection = client.db("caliph-tools").collection("users");
+    const paymentCollection = client.db("caliph-tools").collection("payment");
 
     // ======================================
 
@@ -146,6 +149,15 @@ async function run() {
       res.send(orders);
     });
     // -------------------------------------------
+
+        // Get  API to Read by ID
+        app.get("/orders/:id", async (req, res) => {
+          const id = req.params.id;
+          const query = { _id: ObjectId(id) };
+          const result = await orderCollection.findOne(query);
+          res.send(result);
+        });
+        // -------------------------------------------
 
     // Get  API to Read by Email
     app.get("/orders/:email", verifyJWT, verifyNotAdmin, async (req, res) => {
