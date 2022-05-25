@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
 
@@ -18,6 +19,26 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
+// Verify JWT Middleware
+function verifyJWT(req, res, next) {
+  const authorization = req.headers.authorization;
+
+  if (!authorization) {
+    return res.status(401).send({ message: "UnAuthorized access" });
+  }
+
+  const token = authorization.split(" ")[1];
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+    if (err) {
+      return res.status(403).send({ message: "Forbidden access" });
+    }
+
+    req.decoded = decoded;
+    next();
+  });
+}
+// =====================================================
 // async await function
 async function run() {
   // try catch finally
@@ -32,6 +53,30 @@ async function run() {
 
     // ======================================
 
+    //  Verify Admin Middleware
+    const verifyAdmin = async (req, res, next) => {
+      const requester = req.decoded.email;
+      const requestAccount = await userCollection.findOne({ email: requester });
+      if (requestAccount.role === "Admin") {
+        next();
+      } else {
+        return res.status(403).send({ message: "Forbidden access" });
+      }
+    };
+    // =========================================
+
+    //  Verify Not Admin Middleware
+    const verifyNotAdmin = async (req, res, next) => {
+      const requester = req.decoded.email;
+      const requestAccount = await userCollection.findOne({ email: requester });
+      if (requestAccount.role !== "Admin") {
+        next();
+      } else {
+        return res.status(403).send({ message: "Forbidden access" });
+      }
+    };
+    // =========================================
+
     // Get  api to read all tools
     app.get("/tools", async (req, res) => {
       const tools = (await toolCollection.find().toArray()).reverse();
@@ -40,7 +85,7 @@ async function run() {
     // -------------------------------------------
 
     // Get  API to Tools Read by ID
-    app.get("/tools/:id", async (req, res) => {
+    app.get("/tools/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await toolCollection.findOne(query);
@@ -49,7 +94,7 @@ async function run() {
     // -------------------------------------------
 
     // Create tools api in db
-    app.post("/tools", async (req, res) => {
+    app.post("/tools", verifyJWT, verifyAdmin, async (req, res) => {
       const newTools = req.body;
       const result = await toolCollection.insertOne(newTools);
       res.send(result);
@@ -57,7 +102,7 @@ async function run() {
     // --------------------------------------------------------
 
     //  Update user data in db
-    app.put("/tools/:id", async (req, res) => {
+    app.put("/tools/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const updateTool = req.body;
       const filter = { _id: ObjectId(id) };
@@ -72,7 +117,7 @@ async function run() {
     // -------------------------------------------
 
     //  Delete tools in db
-    app.delete("/tools/:id", async (req, res) => {
+    app.delete("/tools/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await toolCollection.deleteOne(query);
@@ -88,7 +133,7 @@ async function run() {
     // -------------------------------------------
 
     // Create reviews api in db
-    app.post("/reviews", async (req, res) => {
+    app.post("/reviews", verifyJWT, verifyNotAdmin, async (req, res) => {
       const newReviews = req.body;
       const result = await reviewCollection.insertOne(newReviews);
       res.send(result);
@@ -96,23 +141,23 @@ async function run() {
     // --------------------------------------------------------
 
     // Get  api to read all tools
-    app.get("/orders", async (req, res) => {
+    app.get("/orders", verifyJWT, verifyAdmin, async (req, res) => {
       const orders = (await orderCollection.find().toArray()).reverse();
       res.send(orders);
     });
     // -------------------------------------------
 
     // Get  API to Read by Email
-    app.get("/orders/:email", async (req, res) => {
+    app.get("/orders/:email", verifyJWT, verifyNotAdmin, async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
-      const result = await orderCollection.find(query).toArray();
+      const result = (await orderCollection.find(query).toArray()).reverse();
       res.send(result);
     });
     // -------------------------------------------
 
     // Create orders api in db
-    app.post("/orders", async (req, res) => {
+    app.post("/orders", verifyJWT, verifyNotAdmin, async (req, res) => {
       const orders = req.body;
       const { quantity, orderQuantity, toolsId: id } = orders;
       const newQuantity = quantity - orderQuantity;
@@ -128,7 +173,7 @@ async function run() {
     // ---------------------------------------------------
 
     //  Update orders data in db
-    app.put("/order/:id", async (req, res) => {
+    app.put("/order/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const updateOrders = req.body;
       const filter = { _id: ObjectId(id) };
@@ -141,13 +186,12 @@ async function run() {
         updateDoc,
         options
       );
-
       res.send(result);
     });
     // -------------------------------------------
 
     //  Delete order in db
-    app.delete("/orders/:id", async (req, res) => {
+    app.delete("/orders/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await orderCollection.deleteOne(query);
@@ -156,14 +200,22 @@ async function run() {
     // -------------------------------------------
 
     // Get  api to read all users
-    app.get("/users", async (req, res) => {
+    app.get("/users", verifyJWT, verifyAdmin, async (req, res) => {
       const users = (await userCollection.find().toArray()).reverse();
       res.send(users);
     });
     // -------------------------------------------
 
+    // Get Admin user search by email
+    app.get("/admin/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      const user = await userCollection.findOne({ email: email });
+      const isAdmin = user.role === "Admin";
+      res.send({ admin: isAdmin });
+    });
+
     // Get  API to Read by Email
-    app.get("/user/:email", async (req, res) => {
+    app.get("/user/:email", verifyJWT, verifyJWT, async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
       const result = await userCollection.findOne(query);
@@ -172,7 +224,7 @@ async function run() {
     // -------------------------------------------
 
     //  Update user data in db
-    app.put("/user/:id", async (req, res) => {
+    app.put("/user/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const updateUser = req.body;
       const filter = { _id: ObjectId(id) };
@@ -197,15 +249,19 @@ async function run() {
       };
       const result = await userCollection.updateOne(filter, updateDoc, options);
 
-      // var token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, {
-      //   expiresIn: "1d",
-      // });
-      res.send(result);
+      const token = jwt.sign(
+        { email: email },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+          expiresIn: "1d",
+        }
+      );
+      res.send({ result, token });
     });
     // -------------------------------------------
 
     //  Delete user in db
-    app.delete("/user/:id", async (req, res) => {
+    app.delete("/user/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await userCollection.deleteOne(query);
