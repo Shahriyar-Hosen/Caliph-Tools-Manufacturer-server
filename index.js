@@ -81,7 +81,7 @@ async function run() {
     // =========================================
 
     // Payment Intent Api
-    app.post("/create-payment-intent",verifyJWT, async (req, res) => {
+    app.post("/create-payment-intent", verifyJWT, async (req, res) => {
       const { price } = req.body;
       const amount = price * 100;
       const paymentIntent = await stripe.paymentIntents.create({
@@ -96,7 +96,6 @@ async function run() {
       res.send({ clientSecret: paymentIntent.client_secret });
     });
     // -----------------------------------------------------------------------------------
-
 
     // Get  api to read all tools
     app.get("/tools", async (req, res) => {
@@ -168,14 +167,14 @@ async function run() {
     });
     // -------------------------------------------
 
-        // Get  API to Read by ID
-        app.get("/orders/:id", async (req, res) => {
-          const id = req.params.id;
-          const query = { _id: ObjectId(id) };
-          const result = await orderCollection.findOne(query);
-          res.send(result);
-        });
-        // -------------------------------------------
+    // Get  API to Read by ID
+    app.get("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await orderCollection.findOne(query);
+      res.send(result);
+    });
+    // -------------------------------------------
 
     // Get  API to Read by Email
     app.get("/orders/:email", verifyJWT, verifyNotAdmin, async (req, res) => {
@@ -220,23 +219,26 @@ async function run() {
     });
     // -------------------------------------------
 
-        //  Update payment data in db
-        app.patch('/orders/:id', verifyJWT, async(req, res) =>{
-          const id  = req.params.id;
-          const payment = req.body;
-          const filter = {_id: ObjectId(id)};
-          const updatedDoc = {
-            $set: {
-              paid: true,
-              transactionId: payment.transactionId
-            }
-          }
-    
-          const result = await paymentCollection.insertOne(payment);
-          const updatedBooking = await orderCollection.updateOne(filter, updatedDoc);
-          res.send(updatedBooking);
-        })
-        // -------------------------------------------
+    //  Update payment data in db
+    app.patch("/orders/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const payment = req.body;
+      const filter = { _id: ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          paid: true,
+          transactionId: payment.transactionId,
+        },
+      };
+
+      const result = await paymentCollection.insertOne(payment);
+      const updatedBooking = await orderCollection.updateOne(
+        filter,
+        updatedDoc
+      );
+      res.send(updatedBooking);
+    });
+    // -------------------------------------------
 
     //  Delete order in db
     app.delete("/orders/:id", verifyJWT, async (req, res) => {
