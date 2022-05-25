@@ -24,18 +24,14 @@ const client = new MongoClient(uri, {
 // Verify JWT Middleware
 function verifyJWT(req, res, next) {
   const authorization = req.headers.authorization;
-
   if (!authorization) {
     return res.status(401).send({ message: "UnAuthorized access" });
   }
-
   const token = authorization.split(" ")[1];
-
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
     if (err) {
       return res.status(403).send({ message: "Forbidden access" });
     }
-
     req.decoded = decoded;
     next();
   });
@@ -85,13 +81,9 @@ async function run() {
       const { price } = req.body;
       const amount = price * 100;
       const paymentIntent = await stripe.paymentIntents.create({
-        // amount: calculateOrderAmount(amount),
         amount: amount,
         currency: "usd",
         payment_method_types: ["card"],
-        // automatic_payment_methods: {
-        //   enabled: true,
-        // },
       });
       res.send({ clientSecret: paymentIntent.client_secret });
     });
