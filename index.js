@@ -113,7 +113,7 @@ async function run() {
     });
     // --------------------------------------------------------
 
-    //  Update user data in db
+    //  Update tools data in db
     app.put("/tools/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const updateTool = req.body;
@@ -257,7 +257,7 @@ async function run() {
     });
 
     // Get  API to Read by Email
-    app.get("/user/:email", verifyJWT, verifyJWT, async (req, res) => {
+    app.get("/user/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
       const result = await userCollection.findOne(query);
@@ -266,7 +266,7 @@ async function run() {
     // -------------------------------------------
 
     //  Update user data in db
-    app.put("/user/:id", verifyJWT, verifyAdmin, async (req, res) => {
+    app.put("/user/:id", verifyJWT,  async (req, res) => {
       const id = req.params.id;
       const updateUser = req.body;
       const filter = { _id: ObjectId(id) };
