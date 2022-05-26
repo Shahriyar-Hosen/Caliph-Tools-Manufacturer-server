@@ -179,7 +179,7 @@ async function run() {
     // -------------------------------------------
 
     // Create orders api in db
-    app.post("/orders", verifyJWT, verifyNotAdmin, async (req, res) => {
+    app.post("/orders", verifyJWT, async (req, res) => {
       const orders = req.body;
       const { quantity, orderQuantity, toolsId: id } = orders;
       const newQuantity = quantity - orderQuantity;
