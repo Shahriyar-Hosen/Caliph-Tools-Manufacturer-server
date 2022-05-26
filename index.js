@@ -152,7 +152,7 @@ async function run() {
     });
     // --------------------------------------------------------
 
-    // Get  api to read all tools
+    // Get  api to read all orders
     app.get("/orders", verifyJWT, verifyAdmin, async (req, res) => {
       const orders = (await orderCollection.find().toArray()).reverse();
       res.send(orders);
@@ -160,7 +160,7 @@ async function run() {
     // -------------------------------------------
 
     // Get  API to Read by ID
-    app.get("/orders/:id", verifyJWT,async (req, res) => {
+    app.get("/orders/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await orderCollection.findOne(query);
@@ -169,7 +169,7 @@ async function run() {
     // -------------------------------------------
 
     // Get  API to Read by Email
-    app.get("/order/:email",verifyJWT, async (req, res) => {
+    app.get("/order/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
       const result = (await orderCollection.find(query).toArray()).reverse();
