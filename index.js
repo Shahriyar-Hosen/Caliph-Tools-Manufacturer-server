@@ -40,7 +40,7 @@ function verifyJWT(req, res, next) {
 
 // async await function
 async function run() {
-  // try catch finally
+  
   try {
     await client.connect();
 
