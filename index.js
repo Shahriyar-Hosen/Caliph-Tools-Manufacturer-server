@@ -50,7 +50,6 @@ async function run() {
     const orderCollection = client.db("caliph-tools").collection("orders");
     const userCollection = client.db("caliph-tools").collection("users");
     const paymentCollection = client.db("caliph-tools").collection("payment");
-
     // ======================================
 
     //  Verify Admin Middleware
