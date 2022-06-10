@@ -52,7 +52,7 @@ async function run() {
     const paymentCollection = client.db("caliph-tools").collection("payment");
     // ======================================
 
-    //  Verify Admin Middleware
+    // Verify Admin Middleware
     const verifyAdmin = async (req, res, next) => {
       const requester = req.decoded.email;
       const requestAccount = await userCollection.findOne({ email: requester });
@@ -64,7 +64,7 @@ async function run() {
     };
     // =========================================
 
-    //  Verify Not Admin Middleware
+    // Verify Not Admin Middleware
     const verifyNotAdmin = async (req, res, next) => {
       const requester = req.decoded.email;
       const requestAccount = await userCollection.findOne({ email: requester });
@@ -113,7 +113,7 @@ async function run() {
     });
     // --------------------------------------------------------
 
-    //  Update tools data in db
+    // Update tools data in db
     app.put("/tools/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const updateTool = req.body;
@@ -128,7 +128,7 @@ async function run() {
     });
     // -------------------------------------------
 
-    //  Delete tools in db
+    // Delete tools in db
     app.delete("/tools/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
@@ -193,7 +193,7 @@ async function run() {
     });
     // ---------------------------------------------------
 
-    //  Update orders data in db
+    // Update orders data in db
     app.put("/order/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const updateOrders = req.body;
@@ -211,7 +211,7 @@ async function run() {
     });
     // -------------------------------------------
 
-    //  Update payment data in db
+    // Update payment data in db
     app.patch("/orders/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const payment = req.body;
@@ -232,7 +232,7 @@ async function run() {
     });
     // -------------------------------------------
 
-    //  Delete order in db
+    // Delete order in db
     app.delete("/orders/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
@@ -265,7 +265,7 @@ async function run() {
     });
     // -------------------------------------------
 
-    //  Update user data in db
+    // Update user data in db
     app.put("/user/:id", verifyJWT,  async (req, res) => {
       const id = req.params.id;
       const updateUser = req.body;
@@ -280,7 +280,7 @@ async function run() {
     });
     // -------------------------------------------
 
-    //  Update (upsert / insert) user data in db
+    // Update (upsert / insert) user data in db
     app.put("/users/:email", async (req, res) => {
       const email = req.params.email;
       const user = req.body;
@@ -302,7 +302,7 @@ async function run() {
     });
     // -------------------------------------------
 
-    //  Delete user in db
+    // Delete user in db
     app.delete("/user/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
